@@ -1,0 +1,5 @@
+Telescope1
+5
+127.0.0.1
+8151
+telescope1
