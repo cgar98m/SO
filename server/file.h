@@ -57,6 +57,13 @@ int FILE_createFile(char * file_name, char * data, long bytes);
 ************************************************************/
 int FILE_updateRegister(char * info);
 
+/**************************************************************
+* @Nombre: FILE_getAstroData
+* @Def: Obtiene los datos de las constelaciones de un fichero
+* @Arg:	In: file_name = fichero a leer
+*		Out: data = informacion de las constelaciones
+* @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
+**************************************************************/
 int FILE_getAstroData(char * file_name, struct AstroData * data);
 
 #endif

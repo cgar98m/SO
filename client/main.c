@@ -302,10 +302,8 @@ void closeProgram() {
 ********************************************************/
 int main(int argc, char ** argv) {
 
-	//Turn off flag
-	turn_off = -1;
-
 	//Set default config
+	turn_off = -1;
 	CONFIG_defaultConfig(&config);
 	server_fd = -1;
 

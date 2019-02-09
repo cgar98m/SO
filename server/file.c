@@ -350,6 +350,13 @@ int FILE_updateRegister(char * info) {
 	
 }
 
+/**************************************************************
+* @Nombre: FILE_getAstroData
+* @Def: Obtiene los datos de las constelaciones de un fichero
+* @Arg:	In: file_name = fichero a leer
+*		Out: data = informacion de las constelaciones
+* @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
+**************************************************************/
 int FILE_getAstroData(char * file_name, struct AstroData * data) {
 
 	int fd;
@@ -366,7 +373,7 @@ int FILE_getAstroData(char * file_name, struct AstroData * data) {
 	}
 	
 	//Prepare aux data
-	struct AstroData new_data = defaultData();
+	struct AstroData new_data = ASTRODATA_defaultData();
 	char * aux;
 	double aux_d;
 	
@@ -423,7 +430,7 @@ int FILE_getAstroData(char * file_name, struct AstroData * data) {
 		return -1;
 	}
 	
-	//Update data
+	//Set data to return
 	data->total_const = new_data.total_const;
 	data->density_avg = new_data.density_avg;
 	data->min_mag = new_data.min_mag;

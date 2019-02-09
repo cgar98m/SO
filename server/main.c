@@ -219,7 +219,7 @@ void paquita() {
 	long imgs_size = 0;
 	long received_txts = 0;
 	double const_avg = 0.0f;
-	struct AstroData data = defaultData();
+	struct AstroData data = ASTRODATA_defaultData();
 	
 	//Listen to lionel messages
 	struct NewDataMsg msg = defaultMsg();
