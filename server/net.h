@@ -12,12 +12,14 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <time.h>
+#include <sys/msg.h>
 
 #include "menu.h"
 #include "netpack.h"
 #include "sendconfig.h"
 #include "file.h"
 #include "semaphore.h"
+#include "msg.h"
 
 //Max connections
 #define MAX_CONNECTIONS 10
@@ -82,8 +84,9 @@ char * NET_establishConnection(int fd);
 *		In/Out: info_register = registro de la informacion recibida
 *		In/Out: total_info = total de ficheros txt recibidos
 *		In: info_s = semaforo de los ficheros de texto
+*		In: q_id = id de la cola de mensages
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si se desea desconectar el cliente
 *********************************************************************************************/
-int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s);
+int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s, int q_id);
 
 #endif

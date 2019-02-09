@@ -48,6 +48,9 @@
 #define RECEIVING_FILE "Receiving data from %s...\n"
 #define RECEIVED_FILE "\nFile %s received.\n"
 
+//Message queue error
+#define MSGQ_ERROR "Error! Could not create message queue!\n"
+
 /*****************************************************
 * @Nombre: MENU_argError
 * @Def: Notifica si hay exceso o falta de parametros

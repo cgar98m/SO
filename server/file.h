@@ -11,6 +11,7 @@
 
 #include "config.h"
 #include "sendconfig.h"
+#include "astrodata.h"
 
 //Path buff size
 #define MAX_PATH 128
@@ -55,5 +56,7 @@ int FILE_createFile(char * file_name, char * data, long bytes);
 * @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
 ************************************************************/
 int FILE_updateRegister(char * info);
+
+int FILE_getAstroData(char * file_name, struct AstroData * data);
 
 #endif

@@ -334,7 +334,6 @@ int FILE_updateRegister(char * info) {
 	//Open file
 	fd = open(full_path, O_WRONLY | O_APPEND | O_CREAT, 0644);
 	if(fd < 0) {
-		close(fd);
 		return -1;
 	}
 	
@@ -346,6 +345,89 @@ int FILE_updateRegister(char * info) {
 	}
 	
 	//Close file
+	close(fd);
+	return 1;
+	
+}
+
+int FILE_getAstroData(char * file_name, struct AstroData * data) {
+
+	int fd;
+	char full_path[MAX_PATH];
+	
+	//Get full path
+	strcpy(full_path, FILE_PATH);
+	strcat(full_path, file_name);
+	
+	//Open file
+	fd = open(full_path, O_RDONLY);
+	if(fd < 0) {
+		return -1;
+	}
+	
+	//Prepare aux data
+	struct AstroData new_data = defaultData();
+	char * aux;
+	double aux_d;
+	
+	//Get file data
+	while(1) {
+		
+		//Get density
+		aux = readCharUntil(fd, ' ');
+		if(aux == NULL || aux[0] == '\0') {
+			break;
+		}
+		free(aux);
+		aux = readCharUntil(fd, ' ');
+		if(aux == NULL || aux[0] == '\0') {
+			break;
+		}
+		aux_d = atof(aux);
+		free(aux);
+		
+		//Update density average
+		new_data.density_avg = (new_data.density_avg * new_data.total_const + aux_d) / (double) (new_data.total_const + 1);
+		
+		//Get magnitude
+		aux = readCharUntil(fd, '\n');
+		if(aux == NULL || aux[0] == '\0') {
+			break;
+		}
+		aux_d = atof(aux);
+		free(aux);
+		
+		//Check first loop
+		if(new_data.total_const == 0) {
+			new_data.min_mag = aux_d;
+			new_data.max_mag = aux_d;
+		} else {
+			//Update min data
+			if(aux_d < new_data.min_mag) {
+				new_data.min_mag = aux_d;
+			}
+			//Update max data
+			if(aux_d > new_data.max_mag) {
+				new_data.max_mag = aux_d;
+			}
+		}
+		
+		//Increase data
+		new_data.total_const++;
+		
+	}
+	
+	//Check if data was found
+	if(new_data.total_const == 0) {
+		close(fd);
+		return -1;
+	}
+	
+	//Update data
+	data->total_const = new_data.total_const;
+	data->density_avg = new_data.density_avg;
+	data->min_mag = new_data.min_mag;
+	data->max_mag = new_data.max_mag;
 	close(fd);
 	return 1;
 	

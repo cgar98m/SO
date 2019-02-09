@@ -764,9 +764,10 @@ int prepareRegister(char *** reg, int * total, long size) {
 *		In/Out: info_register = registro de la informacion recibida
 *		In/Out: total_info = total de ficheros txt recibidos
 *		In: info_s = semaforo de los ficheros de texto
+*		In: q_id = id de la cola de mensages
 * @Ret: devuelve 1 si ha ido bien y -1 si ha habido un error
 ********************************************************************/
-int dataManagement(int fd, struct NetPack pack, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s) {
+int dataManagement(int fd, struct NetPack pack, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s, int q_id) {
 
 	//Check pack header
 	if(strcmp(pack.header, METADATA_HEADER) != 0) {
@@ -800,11 +801,15 @@ int dataManagement(int fd, struct NetPack pack, char * telescope, char *** imgs_
 			SEM_wait(&info_s);
 			prepareRegister(info_register, total_info, s_config->size);
 			SEM_signal(&info_s);
+			struct NewDataMsg msg = newMsg(1, "txt", s_config->size, s_config->file);
+			msgsnd(q_id, (struct msgbuf *) &msg, sizeof(msg) - sizeof(long), IPC_NOWAIT);
 		}
 		if(strcmp(s_config->type, "jpg") == 0) {
 			SEM_wait(&imgs_s);
 			prepareRegister(imgs_register, total_imgs, s_config->size);
 			SEM_signal(&imgs_s);
+			struct NewDataMsg msg = newMsg(1, "jpg", s_config->size, s_config->file);
+			msgsnd(q_id, (struct msgbuf *) &msg, sizeof(msg) - sizeof(long), IPC_NOWAIT);
 		}
 	}
 	free(s_config);
@@ -823,9 +828,10 @@ int dataManagement(int fd, struct NetPack pack, char * telescope, char *** imgs_
 *		In/Out: info_register = registro de la informacion recibida
 *		In/Out: total_info = total de ficheros txt recibidos
 *		In: info_s = semaforo de los ficheros de texto
+*		In: q_id = id de la cola de mensages
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si se desea desconectar el cliente
 *********************************************************************************************/
-int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s) {
+int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s, int q_id) {
 	
 	struct NetPack pack;
 	
@@ -856,7 +862,7 @@ int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * t
 			return -2;
 
 		case DATA_T:	//Send file request
-			response = dataManagement(fd, pack, telescope, imgs_register, total_imgs, imgs_s, info_register, total_info, info_s);
+			response = dataManagement(fd, pack, telescope, imgs_register, total_imgs, imgs_s, info_register, total_info, info_s, q_id);
 			NETPACK_cleanPack(&pack);
 			return response;
 			

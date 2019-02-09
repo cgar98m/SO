@@ -3,12 +3,17 @@
 #include <signal.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <sys/msg.h>
 
 #include "config.h"
 #include "file.h"
 #include "menu.h"
 #include "net.h"
 #include "flist.h"
+#include "msg.h"
+
+#define KEY_FILE "makefile"
+#define KEY 1
 
 //Config
 struct Config config;
@@ -30,6 +35,9 @@ semaphore client_s;
 semaphore thread_s;
 semaphore imgs_s;
 semaphore info_s;
+
+//Message queue
+int q_id;
 
 /***********************************************************************************
 * @Nombre: clientManagement
@@ -57,7 +65,7 @@ void * clientManagement(void * client) {
 	//Listen to the client
 	int response;
 	do {
-		response = NET_listenToClient(client_fd, telescope, &imgs_register, &total_imgs, imgs_s, &info_register, &total_info, info_s);
+		response = NET_listenToClient(client_fd, telescope, &imgs_register, &total_imgs, imgs_s, &info_register, &total_info, info_s, q_id);
 	} while(response > 0);
 	
 	//Disconnect client
@@ -135,6 +143,9 @@ void closeProgram() {
 	SEM_destructor(&imgs_s);
 	SEM_destructor(&info_s);
 	
+	//Destroy message queue
+	msgctl(q_id, IPC_RMID, (struct msqid_ds *) NULL);
+	
 	//Exit program
 	exit(EXIT_SUCCESS);
 	
@@ -200,7 +211,45 @@ void lionel() {
 **************************************/
 void paquita() {
 	
+	char buff[1024];
+	int bytes;
+	
+	//Data --> F5: shared memory with semaphores
+	long received_imgs = 0;
+	long imgs_size = 0;
+	long received_txts = 0;
+	double const_avg = 0.0f;
+	struct AstroData data = defaultData();
+	
+	//Listen to lionel messages
+	struct NewDataMsg msg = defaultMsg();
 	while(1) {
+		
+		//Prepare message
+		cleanMsg(&msg);
+		//Get message (blocking read)
+		msgrcv(q_id, (struct msgbuf *) &msg, sizeof(msg) - sizeof(long), 1, 0);
+		if(msg.id == -1) {
+			continue;
+		}
+		
+		//Process message
+		if(strcmp(msg.type, "jpg") == 0) {
+			received_imgs++;
+			imgs_size += msg.bytes;
+			bytes = sprintf(buff, "IMGS: %ld\nSIZE: %ld\nTXTS: %ld\nAVG CONSTELACIONS: %.2f\nCONST TOTALS: %ld\nAVG DENSITAT: %.3f\nMAX: %.2f\nMIN: %.2f\n",
+			received_imgs, imgs_size, received_txts, const_avg, data.total_const, data.density_avg, data.max_mag, data.min_mag);
+			write(1, buff, bytes);
+		} else {
+			if(FILE_getAstroData(msg.file_name, &data) > 0) {
+				const_avg = (const_avg * received_txts + data.total_const) / (double) (received_txts + 1);
+				received_txts++;
+				bytes = sprintf(buff, "IMGS: %ld\nSIZE: %ld\nTXTS: %ld\nAVG CONSTELACIONS: %.2f\nCONST TOTALS: %ld\nAVG DENSITAT: %.3f\nMAX: %.2f\nMIN: %.2f\n",
+				received_imgs, imgs_size, received_txts, const_avg, data.total_const, data.density_avg, data.max_mag, data.min_mag);
+				write(1, buff, bytes);
+			}
+		}
+		
 	}
 	
 }
@@ -222,6 +271,7 @@ int main(int argc, char ** argv) {
 	total_imgs = 0;
 	info_register = NULL;
 	total_info = 0;
+	q_id = -1;
 	
 	//Prepare semaphores
 	SEM_constructor(&thread_s);
@@ -250,7 +300,15 @@ int main(int argc, char ** argv) {
 		pause();		//Wait for SIGINT
 	}
 	
-	//Create Paquita
+	//Prepare message queue for Paquita
+	q_id = msgget(ftok(KEY_FILE, KEY), 0600 | IPC_CREAT);
+	if(q_id == -1) {
+		write(1, MSGQ_ERROR, strlen(MSGQ_ERROR));
+		raise(SIGINT);	//Close program
+		pause();		//Wait for SIGINT
+	}
+	
+	//Create Paquita and start Lionel service
 	int id = fork();
 	if(id < 0) {
 		raise(SIGINT);	//Close program
