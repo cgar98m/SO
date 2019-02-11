@@ -21,8 +21,6 @@
 
 //Close program messages
 #define CLOSE_PROGRAM "\nClosing Lionel...\n"
-#define CLOSE_CLIENTS "Closing connected clients...\n"
-#define DUMP_START "Received files register started...\n"
 
 //Config error messages
 #define CONFIG_ERROR "Error! Configuration not load!\n"
@@ -48,7 +46,10 @@
 #define RECEIVING_FILE "Receiving data from %s...\n"
 #define RECEIVED_FILE "\nFile %s received.\n"
 
-//Message queue error
+//List of clients error messages
+#define LIST_ERROR "Error! Could not create list of clients!"
+
+//Message queue error messages
 #define MSGQ_ERROR "Error! Could not create message queue!\n"
 
 /*****************************************************

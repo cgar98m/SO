@@ -26,7 +26,7 @@ int FLIST_create(struct FList * list) {
 *		In: e = elemento a anadir
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si ya existia
 ***********************************************************************/
-int FLIST_add(struct FList * list, int e) {
+int FLIST_add(struct FList * list, pthread_t e) {
 	
 	//Check pointer
 	if(list == NULL) {
@@ -87,7 +87,7 @@ int FLIST_add(struct FList * list, int e) {
 *		In: e = elemento a eliminar
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si no existia
 ***********************************************************************/
-int FLIST_remove(struct FList * list, int e) {
+int FLIST_remove(struct FList * list, pthread_t e) {
 
 	//Check pointer
 	if(list == NULL) {
@@ -137,7 +137,7 @@ int FLIST_remove(struct FList * list, int e) {
 *		Out: e = numero a devolver
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal
 ***************************************************/
-int FLIST_getFirst(struct FList list, int * e) {
+int FLIST_getFirst(struct FList list, pthread_t * e) {
 	
 	//Check empty list
 	if(list.head == NULL) {

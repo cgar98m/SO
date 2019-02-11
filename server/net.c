@@ -111,9 +111,9 @@ int NET_sendDisconnectMsg(int fd, int type) {
 	
 	//Prepare reply
 	if(type > 0) {
-		reply = NETPACK_makeNetPack(DISCONNECT_T, CONNECT_OK_H, NULL);
+		reply = NETPACK_makeNetPack(DISCONNECT_T, CONNECT_OK_H, NULL, 0);
 	} else {
-		reply = NETPACK_makeNetPack(DISCONNECT_T, CONNECT_KO_H, NULL);
+		reply = NETPACK_makeNetPack(DISCONNECT_T, CONNECT_KO_H, NULL, 0);
 	}
 	
 	if(reply.length == -1) {
@@ -145,9 +145,9 @@ int connectManagement(int fd, int type) {
 	
 	//Prepare reply
 	if(type > 0) {
-		reply = NETPACK_makeNetPack(CONNECT_T, CONNECT_OK_H, NULL);
+		reply = NETPACK_makeNetPack(CONNECT_T, CONNECT_OK_H, NULL, 0);
 	} else {
-		reply = NETPACK_makeNetPack(CONNECT_T, CONNECT_KO_H, NULL);
+		reply = NETPACK_makeNetPack(CONNECT_T, CONNECT_KO_H, NULL, 0);
 	}
 	
 	if(reply.length == -1) {
@@ -191,7 +191,6 @@ char * readByteUntilFromFd(int fd, char delimiter) {
 		
 		//Read char
 		if(read(fd, &aux, sizeof(char)) != 1) {
-			perror("E2");
 			break;
 		}
 		
@@ -286,7 +285,6 @@ struct NetPack getNetPack(int fd) {
 	if(read(fd, pack.data, pack.length) <= 0) {
 		NETPACK_cleanPack(&pack);
 	}
-	
 	return pack;
 
 }
@@ -330,7 +328,10 @@ char * NET_establishConnection(int fd) {
 		connectManagement(fd, -1);
 		return NULL;
 	}
-	strcpy(telescope, pack.data);
+	for(int i = 0; i < pack.length; i++) {
+		telescope[i] = pack.data[i];
+	}
+	telescope[pack.length] = '\0';
 	NETPACK_cleanPack(&pack);
 
 	//Send connect reply
@@ -359,7 +360,7 @@ int sendDataMsg(int fd, char * header) {
 	struct NetPack reply;
 	
 	//Prepare reply
-	reply = NETPACK_makeNetPack(DATA_T, header, NULL);
+	reply = NETPACK_makeNetPack(DATA_T, header, NULL, 0);
 	if(reply.length == -1) {
 		return -1;
 	}
@@ -472,9 +473,10 @@ int getFileData(int fd, struct SendConfig * s_config, char * data, long length) 
 * @Def: Recibe la informacion de un fichero enviado por un cliente
 * @Arg:	In: fd = file descriptor
 *		In/Out: s_config = configuracion del envio
+*		In: turn_off = puntero al flag que indica si se quiere cerrar el servidor
 * @Ret: devuelve 1 si ha ido bien y -1 si ha habido un error
 *******************************************************************/
-int receiveData(int fd, struct SendConfig * s_config) {
+int receiveData(int fd, struct SendConfig * s_config, int * turn_off) {
 	
 	struct NetPack pack;
 	
@@ -484,7 +486,15 @@ int receiveData(int fd, struct SendConfig * s_config) {
 		write(1, COMMUNICATION_ERROR, strlen(COMMUNICATION_ERROR));
 		if(pack.length < -1) {
 			sendDataMsg(fd, FILE_KO_H);
+		} else {
+			NETPACK_cleanPack(&pack);
 		}
+		return -1;
+	}
+	
+	//Check if want to close server
+	if(*turn_off > 0) {
+		NETPACK_cleanPack(&pack);
 		return -1;
 	}
 	
@@ -498,7 +508,7 @@ int receiveData(int fd, struct SendConfig * s_config) {
 		if(response < 0) {
 			return -1;
 		} else {
-			return receiveData(fd, s_config);
+			return receiveData(fd, s_config, turn_off);
 		}
 		
 	}
@@ -765,9 +775,10 @@ int prepareRegister(char *** reg, int * total, long size) {
 *		In/Out: total_info = total de ficheros txt recibidos
 *		In: info_s = semaforo de los ficheros de texto
 *		In: q_id = id de la cola de mensages
+*		In: turn_off = puntero al flag que indica si se quiere cerrar el servidor
 * @Ret: devuelve 1 si ha ido bien y -1 si ha habido un error
 ********************************************************************/
-int dataManagement(int fd, struct NetPack pack, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s, int q_id) {
+int dataManagement(int fd, struct NetPack pack, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s, int q_id, int * turn_off) {
 
 	//Check pack header
 	if(strcmp(pack.header, METADATA_HEADER) != 0) {
@@ -795,23 +806,24 @@ int dataManagement(int fd, struct NetPack pack, char * telescope, char *** imgs_
 	}
 	
 	//Receive data
-	int response = receiveData(fd, s_config);
+	int response = receiveData(fd, s_config, turn_off);
 	if(response > 0) {	//Update register params
 		if(strcmp(s_config->type, "txt") == 0) {
 			SEM_wait(&info_s);
 			prepareRegister(info_register, total_info, s_config->size);
 			SEM_signal(&info_s);
-			struct NewDataMsg msg = newMsg(1, "txt", s_config->size, s_config->file);
-			msgsnd(q_id, (struct msgbuf *) &msg, sizeof(msg) - sizeof(long), IPC_NOWAIT);
+			struct NewDataMsg msg = MSG_newMsg(1, "txt", s_config->size, s_config->file);
+			msgsnd(q_id, (struct msgbuf *) &msg, sizeof(struct NewDataMsg) - sizeof(long), IPC_NOWAIT);
 		}
 		if(strcmp(s_config->type, "jpg") == 0) {
 			SEM_wait(&imgs_s);
 			prepareRegister(imgs_register, total_imgs, s_config->size);
 			SEM_signal(&imgs_s);
-			struct NewDataMsg msg = newMsg(1, "jpg", s_config->size, s_config->file);
-			msgsnd(q_id, (struct msgbuf *) &msg, sizeof(msg) - sizeof(long), IPC_NOWAIT);
+			struct NewDataMsg msg = MSG_newMsg(1, "jpg", s_config->size, s_config->file);
+			msgsnd(q_id, (struct msgbuf *) &msg, sizeof(struct NewDataMsg) - sizeof(long), IPC_NOWAIT);
 		}
 	}
+	SENDCONFIG_cleanConfig(s_config);
 	free(s_config);
 	return response;
 
@@ -829,9 +841,10 @@ int dataManagement(int fd, struct NetPack pack, char * telescope, char *** imgs_
 *		In/Out: total_info = total de ficheros txt recibidos
 *		In: info_s = semaforo de los ficheros de texto
 *		In: q_id = id de la cola de mensages
+*		In: turn_off = puntero al flag que indica si se quiere cerrar el servidor
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si se desea desconectar el cliente
 *********************************************************************************************/
-int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s, int q_id) {
+int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s, int q_id, int * turn_off) {
 	
 	struct NetPack pack;
 	
@@ -848,6 +861,17 @@ int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * t
 		return -1;
 	}
 	
+	//Check if want to close server
+	if(*turn_off > 0) {
+		if(NET_sendDisconnectMsg(fd, 1) < 0) {
+			MENU_disconnectKo(telescope);
+		} else {
+			MENU_disconnectOk(telescope);
+		}
+		NETPACK_cleanPack(&pack);
+		return -2;
+	}
+	
 	//Recognize net pack type
 	int response;
 	switch(pack.type) {
@@ -862,7 +886,7 @@ int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * t
 			return -2;
 
 		case DATA_T:	//Send file request
-			response = dataManagement(fd, pack, telescope, imgs_register, total_imgs, imgs_s, info_register, total_info, info_s, q_id);
+			response = dataManagement(fd, pack, telescope, imgs_register, total_imgs, imgs_s, info_register, total_info, info_s, q_id, turn_off);
 			NETPACK_cleanPack(&pack);
 			return response;
 			

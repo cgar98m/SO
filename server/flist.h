@@ -2,10 +2,11 @@
 #define _FLIST_H
 
 #include <stdlib.h>
+#include <pthread.h>
 
 //Node
 struct Node {
-	int e;
+	pthread_t e;
 	struct Node * next;
 };
 
@@ -29,7 +30,7 @@ int FLIST_create(struct FList * list);
 *		In: e = elemento a anadir
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si ya existia
 ***********************************************************************/
-int FLIST_add(struct FList * list, int e);
+int FLIST_add(struct FList * list, pthread_t e);
 
 /***********************************************************************
 * @Nombre: FLIST_remove
@@ -38,7 +39,7 @@ int FLIST_add(struct FList * list, int e);
 *		In: e = elemento a eliminar
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si no existia
 ***********************************************************************/
-int FLIST_remove(struct FList * list, int e);
+int FLIST_remove(struct FList * list, pthread_t e);
 
 /***************************************************
 * @Nombre: FLIST_getFirst
@@ -47,7 +48,7 @@ int FLIST_remove(struct FList * list, int e);
 *		Out: e = numero a devolver
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal
 ***************************************************/
-int FLIST_getFirst(struct FList list, int * e);
+int FLIST_getFirst(struct FList list, pthread_t * e);
 
 /************************************************************
 * @Nombre: FLIST_empty

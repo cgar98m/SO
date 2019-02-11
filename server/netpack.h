@@ -58,8 +58,9 @@ void NETPACK_cleanPack(struct NetPack * pack);
 * @Arg:	In: type = tipo del paquete
 *		In: header = cabecera del paquete
 *		In: data = datos del paquete
+*		In: size = tamaño de los datos en bytes
 * @Ret: devuelve el paquete creado
 ***************************************************/
-struct NetPack NETPACK_makeNetPack(char type, char * header, char * data);
+struct NetPack NETPACK_makeNetPack(char type, char * header, char * data, int size);
 
 #endif

@@ -52,7 +52,7 @@ char * readCharUntil(int fd, char delimiter) {
 	data[bytes] = '\0';
 	
 	//Check if has '\r'
-	if(data[bytes - 1] == '\r') {
+	if(bytes > 0 && data[bytes - 1] == '\r') {
 		
 		//Replace '\r'
 		data[bytes - 1] = '\0';
@@ -383,11 +383,17 @@ int FILE_getAstroData(char * file_name, struct AstroData * data) {
 		//Get density
 		aux = readCharUntil(fd, ' ');
 		if(aux == NULL || aux[0] == '\0') {
+			if(aux != NULL) {
+				free(aux);
+			}
 			break;
 		}
 		free(aux);
 		aux = readCharUntil(fd, ' ');
 		if(aux == NULL || aux[0] == '\0') {
+			if(aux != NULL) {
+				free(aux);
+			}
 			break;
 		}
 		aux_d = atof(aux);
@@ -399,6 +405,9 @@ int FILE_getAstroData(char * file_name, struct AstroData * data) {
 		//Get magnitude
 		aux = readCharUntil(fd, '\n');
 		if(aux == NULL || aux[0] == '\0') {
+			if(aux != NULL) {
+				free(aux);
+			}
 			break;
 		}
 		aux_d = atof(aux);

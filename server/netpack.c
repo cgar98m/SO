@@ -45,9 +45,10 @@ void NETPACK_cleanPack(struct NetPack * pack) {
 * @Arg:	In: type = tipo del paquete
 *		In: header = cabecera del paquete
 *		In: data = datos del paquete
+*		In: size = tamaño de los datos en bytes
 * @Ret: devuelve el paquete creado
 ***************************************************/
-struct NetPack NETPACK_makeNetPack(char type, char * header, char * data) {
+struct NetPack NETPACK_makeNetPack(char type, char * header, char * data, int size) {
 
 	struct NetPack pack;
 	
@@ -58,7 +59,7 @@ struct NetPack NETPACK_makeNetPack(char type, char * header, char * data) {
 	pack.type = type;
 	
 	//Set header
-	pack.header = (char *) malloc(strlen(header));
+	pack.header = (char *) malloc(strlen(header) + 1);
 	if(pack.header == NULL) {
 		NETPACK_cleanPack(&pack);
 		return pack;
@@ -72,15 +73,18 @@ struct NetPack NETPACK_makeNetPack(char type, char * header, char * data) {
 	}
 	
 	//Set data
-	pack.data = (char *) malloc(strlen(data));
+	pack.data = (char *) malloc(size);
 	if(pack.data == NULL) {
 		NETPACK_cleanPack(&pack);
 		return pack;
 	}
-	strcpy(pack.data, data);
+	for(int i = 0; i < size; i++) {
+		pack.data[i] = data[i];
+	}
 	
 	//Set length
-	pack.length = strlen(data) + 1;
+	pack.length = size;
+	
 	return pack;
 	
 }

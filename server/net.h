@@ -85,8 +85,9 @@ char * NET_establishConnection(int fd);
 *		In/Out: total_info = total de ficheros txt recibidos
 *		In: info_s = semaforo de los ficheros de texto
 *		In: q_id = id de la cola de mensages
+*		In: turn_off = puntero al flag que indica si se quiere cerrar el servidor
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si se desea desconectar el cliente
 *********************************************************************************************/
-int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s, int q_id);
+int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * total_imgs, semaphore imgs_s, char *** info_register, int * total_info, semaphore info_s, int q_id, int * turn_off);
 
 #endif
