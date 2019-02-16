@@ -10,6 +10,7 @@
 
 //Send data type
 #define DATA_T 0x03
+#define NO_DATA_T 0x04
 
 //Connection headers
 #define CONNECT_OK_H "[CONOK]"

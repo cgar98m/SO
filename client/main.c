@@ -62,7 +62,7 @@ int sendFile(char * file_name, char type[4], char * path) {
 	
 	//Get file data
 	MENU_fileFound(file_name);
-	data = FILE_readFile(file_name, &bytes, path);
+	data = FILE_readFile(file_name, &bytes, path, &turn_off);
 	
 	//Check if data is ok
 	if(data == NULL) {
@@ -104,7 +104,9 @@ void freeFiles(char ** files, int min, int total) {
 	}
 	
 	//Free pointer
-	free(files);
+	if(files != NULL) {
+		free(files);
+	}
 	
 }
 
@@ -171,12 +173,10 @@ void sendAllFiles(char ** txt, char ** jpg, int total[2], char * path) {
 			freeFiles(txt, i, total[0]);
 			freeFiles(jpg, 0, total[1]);
 			
-			//Check if needs to close program
-			if(response == -1 || response == -3) {
-				disconnect();
-				CONFIG_cleanConfig(&config);
-				exit(EXIT_FAILURE);
-			}
+			//Close program
+			disconnect();
+			CONFIG_cleanConfig(&config);
+			exit(EXIT_FAILURE);
 		
 		}
 		
@@ -221,12 +221,10 @@ void sendAllFiles(char ** txt, char ** jpg, int total[2], char * path) {
 			//Close files
 			freeFiles(jpg, i, total[1]);
 			
-			//Check if needs to close program
-			if(response == -1 || response == -3) {
-				disconnect();
-				CONFIG_cleanConfig(&config);
-				exit(EXIT_FAILURE);
-			}
+			//Close program
+			disconnect();
+			CONFIG_cleanConfig(&config);
+			exit(EXIT_FAILURE);
 		
 		}
 		
@@ -273,6 +271,12 @@ void lookForFiles() {
 		write(1, NO_FILES, strlen(NO_FILES));	
 		freeFiles(txt, 0, total[0]);
 		freeFiles(jpg, 0, total[1]);
+		if(NET_sendNoData(server_fd) < 0) {
+			MENU_disconnect(config.telescope);
+			disconnect();
+			CONFIG_cleanConfig(&config);
+			exit(EXIT_FAILURE);
+		}
 	} else {	//Send files
 		sendAllFiles(txt, jpg, total, config.files_dir);
 	}
@@ -291,6 +295,7 @@ void lookForFiles() {
 void closeProgram() {
 	turn_off = 1;
 	signal(SIGINT, closeProgram);
+	signal(SIGPIPE, closeProgram);
 }
 
 /********************************************************
@@ -345,8 +350,9 @@ int main(int argc, char ** argv) {
 	}
 	write(1, CONNECT_OK, strlen(CONNECT_OK));
 	
-	//Rewrite SIGINT
+	//Rewrite SIGINT and SIGPIPE
 	signal(SIGINT, closeProgram);
+	signal(SIGPIPE, closeProgram);
 	
 	//Look for files loop
 	signal(SIGALRM, lookForFiles);

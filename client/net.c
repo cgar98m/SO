@@ -580,3 +580,24 @@ int NET_sendData(int server_fd, char * data, long bytes, char * date, char type[
 	}
 
 }
+
+int NET_sendNoData(int server_fd) {
+
+	struct NetPack pack;
+
+	//Set up package
+	pack = NETPACK_makeNetPack(NO_DATA_T, DEFAULT_HEADER, NULL, 0);
+	if(pack.length == -1) {
+		return -1;
+	}
+	
+	//Send package
+	if(sendNetPack(server_fd, pack) < 0) {
+		NETPACK_cleanPack(&pack);
+		return -1;
+	}
+	
+	NETPACK_cleanPack(&pack);
+	return 1;
+
+}

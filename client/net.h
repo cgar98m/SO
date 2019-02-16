@@ -81,4 +81,6 @@ int NET_disconnectReply(int server_fd);
 *********************************************************************************/
 int NET_sendData(int server_fd, char * data, long bytes, char * date, char type[4], char * path, int * turn_off);
 
+int NET_sendNoData(int server_fd);
+
 #endif

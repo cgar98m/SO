@@ -358,9 +358,10 @@ int FILE_getDirectoryFiles(char *** txt, char *** jpg, int total[2], char * path
 * @Arg:	In: file_name = nombre del fichero
 *		Out: bytes = numero de bytes de la informacion obtenida
 *		In: path = carpeta donde se encuentra el fichero
+*		In: turn_off = flag que indica si se cierra el programa
 * @Ret: devuelve el contenido del fichero (NULL si ha ido mal)
 ****************************************************************/
-char * FILE_readFile(char * file_name, long * bytes, char * path) {
+char * FILE_readFile(char * file_name, long * bytes, char * path, int * turn_off) {
 	
 	int fd;
 	char full_path[MAX_PATH];
@@ -384,6 +385,13 @@ char * FILE_readFile(char * file_name, long * bytes, char * path) {
 		//Check buffer memory
 		if(buffer == NULL) {
 			close(fd);
+			return NULL;
+		}
+		
+		//Check program end
+		if(*turn_off > 0) {
+			close(fd);
+			free(buffer);
 			return NULL;
 		}
 		

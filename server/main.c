@@ -11,6 +11,7 @@
 #include "net.h"
 #include "flist.h"
 #include "msg.h"
+#include "lista.h"
 
 //Message queue data
 #define KEY_FILE "makefile"
@@ -43,12 +44,19 @@ int turn_off;
 * @Ret: ---
 *******************************************/
 void closeProgram() {
+	
+	//Update flag
 	turn_off = 1;
+	
+	//Stop server listening
 	if(server_fd != -1) {
 		close(server_fd);
 		server_fd = -1;
 	}
+	
+	//Rewrite SIGINT
 	signal(SIGINT, closeProgram);
+	
 }
 
 /**************************************************
@@ -111,6 +119,8 @@ void * clientManagement(void * client) {
 	
 	//Get socket
 	int client_fd = *((int *) client);
+	
+	//Notify main server
 	SEM_signal(&thread_s);
 	
 	//Start connection
@@ -190,6 +200,8 @@ void lionel(struct FList * t_list, struct Config config) {
 	
 	//Wait for dedicated servers closing
 	write(1, CLOSE_PROGRAM, strlen(CLOSE_PROGRAM));
+	
+	//Wait for threads
 	while(FLIST_empty(*t_list) < 0) {
 		FLIST_getFirst(*t_list, &t_id);
 		FLIST_remove(t_list, t_id);

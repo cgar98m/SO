@@ -890,6 +890,10 @@ int NET_listenToClient(int fd, char * telescope, char *** imgs_register, int * t
 			NETPACK_cleanPack(&pack);
 			return response;
 			
+		case NO_DATA_T:	//No files found
+			NETPACK_cleanPack(&pack);
+			return 1;
+			
 		default:		//Undefined request
 			write(1, COMMUNICATION_ERROR, strlen(COMMUNICATION_ERROR));
 			NETPACK_cleanPack(&pack);
