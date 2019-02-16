@@ -1,20 +1,21 @@
 #ifndef _MSG_H
 #define _MSG_H
 
-#include <string.h>
+#include "astrodata.h"
 
 //Max file type
 #define MAX_TYPE 4
 
-//Max file name
-#define MAX_FILE 20
+//File types
+#define JPG_TYPE 0
+#define TXT_TYPE 1
 
 //NewDataMsg
 struct NewDataMsg {
 	long id;
-	char type[MAX_TYPE];
-	long bytes;
-	char file_name[MAX_FILE];
+	int type;
+	double kbytes;
+	struct AstroData astrodata;
 };
 
 /********************************************************************
@@ -30,11 +31,11 @@ struct NewDataMsg MSG_defaultMsg();
 * @Def: Crea un mensaje con los datos especificados
 * @Arg:	In: id = buzon donde se enviara el mensaje
 *		In: type = tipo del fichero recibido
-*		In: bytes = tamano del fichero
-*		In: file_name = nombre del fichero
+*		In: kbytes = tamano del fichero
+*		In: astrodata = informacion del fichero de texto
 * @Ret: Mensaje listo para enviar
 ********************************************************************/
-struct NewDataMsg MSG_newMsg(long id, char type[MAX_TYPE], long bytes, char file_name[MAX_FILE]);
+struct NewDataMsg MSG_newMsg(long id, int type, double kbytes, struct AstroData astrodata);
 
 /*******************************************
 * @Nombre: MSG_cleanMsg

@@ -32,7 +32,7 @@
 
 //Client connection messages
 #define CONNECTION_ERROR "Error! Could not connect to the client!\n"
-#define COMMUNICATION_ERROR "\nError! Wrong package received!\n"
+#define COMMUNICATION_ERROR "Error! Wrong package received!\n"
 #define CONNECT_KO "Error! Could not connect properly to %s!\n"
 #define CONNECT_OK "Connection Lionel-%s ready.\n"
 #define DISCONNECT_KO "Error! Could not disconnect properly from %s!\n"
@@ -42,12 +42,12 @@
 #define INTERNAL_ERROR "Error! Communication process failed!\n"
 
 //File receiving messages
-#define PERCENT_MSG "%s -> %.2f%%"
+#define PERCENT_MSG "%s -> %.2f%%\n"
 #define RECEIVING_FILE "Receiving data from %s...\n"
-#define RECEIVED_FILE "\nFile %s received.\n"
+#define RECEIVED_FILE "File %s received.\n"
 
 //List of clients error messages
-#define LIST_ERROR "Error! Could not create list of clients!"
+#define LIST_ERROR "Error! Could not create list of clients!\n"
 
 //Message queue error messages
 #define MSGQ_ERROR "Error! Could not create message queue!\n"

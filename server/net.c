@@ -808,19 +808,33 @@ int dataManagement(int fd, struct NetPack pack, char * telescope, char *** imgs_
 	//Receive data
 	int response = receiveData(fd, s_config, turn_off);
 	if(response > 0) {	//Update register params
+	
+		struct AstroData data = ASTRODATA_defaultData();
 		if(strcmp(s_config->type, "txt") == 0) {
+			
+			//Update register
 			SEM_wait(&info_s);
 			prepareRegister(info_register, total_info, s_config->size);
 			SEM_signal(&info_s);
-			struct NewDataMsg msg = MSG_newMsg(1, "txt", s_config->size, s_config->file);
-			msgsnd(q_id, (struct msgbuf *) &msg, sizeof(struct NewDataMsg) - sizeof(long), IPC_NOWAIT);
+			
+			//Notify paquita
+			if(FILE_getAstroData(s_config->file, &data) > 0) {
+				struct NewDataMsg msg = MSG_newMsg(1, TXT_TYPE, s_config->size / (double) 1024, data);
+				msgsnd(q_id, (struct msgbuf *) &msg, sizeof(struct NewDataMsg) - sizeof(long), IPC_NOWAIT);
+			}
+			
 		}
 		if(strcmp(s_config->type, "jpg") == 0) {
+			
+			//Update register
 			SEM_wait(&imgs_s);
 			prepareRegister(imgs_register, total_imgs, s_config->size);
 			SEM_signal(&imgs_s);
-			struct NewDataMsg msg = MSG_newMsg(1, "jpg", s_config->size, s_config->file);
+			
+			//Notify paquita
+			struct NewDataMsg msg = MSG_newMsg(1, JPG_TYPE, s_config->size / (double) 1024, data);
 			msgsnd(q_id, (struct msgbuf *) &msg, sizeof(struct NewDataMsg) - sizeof(long), IPC_NOWAIT);
+			
 		}
 	}
 	SENDCONFIG_cleanConfig(s_config);

@@ -69,7 +69,7 @@ void freeResources() {
 	
 	//Free imgs resgister
 	for(int i = 0; i < total_imgs; i++) {
-		FILE_updateRegister(imgs_register[i]);
+		FILE_updateRegister(imgs_register[i], IMG_REGISTER);
 		free(imgs_register[i]);
 	}
 	if(imgs_register != NULL) {
@@ -78,6 +78,7 @@ void freeResources() {
 	
 	//Free info resgister
 	for(int i = 0; i < total_info; i++) {
+		FILE_updateRegister(info_register[i], TXT_REGISTER);
 		free(info_register[i]);
 	}
 	if(info_register != NULL) {
@@ -220,7 +221,7 @@ void paquita() {
 	
 	//Data --> F5: shared memory with semaphores
 	long received_imgs = 0;
-	long imgs_size = 0;
+	double imgs_size = 0;
 	long received_txts = 0;
 	double const_avg = 0.0f;
 	struct AstroData data = ASTRODATA_defaultData();
@@ -238,21 +239,26 @@ void paquita() {
 		}
 		
 		//Process message
-		if(strcmp(msg.type, "jpg") == 0) {
+		if(msg.type == JPG_TYPE) {
 			received_imgs++;
-			imgs_size += msg.bytes;
+			imgs_size += msg.kbytes;
 		} else {
-			if(FILE_getAstroData(msg.file_name, &data) > 0) {
-				const_avg = (const_avg * received_txts + data.total_const) / (double) (received_txts + 1);
-				received_txts++;
-			}
+			data = msg.astrodata;
+			const_avg = (const_avg * received_txts + data.total_const) / (double) (received_txts + 1);
+			received_txts++;
 		}
+		
+		//Show new data
+		char buff[1024];
+		int bytes = sprintf(buff, "\n\n--> PAQUITA INFO <--\nIMGS: %ld\nSIZE: %.3fKB\nTXTS: %ld\nAVG CONSTELACIONS: %.2f\nCONST TOTALS: %ld\nAVG DENSITAT: %.3f\nMAX: %.2f\nMIN: %.2f\n--> END INFO <--\n\n",
+		received_imgs, imgs_size, received_txts, const_avg, data.total_const, data.density_avg, data.max_mag, data.min_mag);
+		write(1, buff, bytes);
 		
 	}
 	
-	//Show data
+	//Show new data
 	char buff[1024];
-	int bytes = sprintf(buff, "IMGS: %ld\nSIZE: %ld\nTXTS: %ld\nAVG CONSTELACIONS: %.2f\nCONST TOTALS: %ld\nAVG DENSITAT: %.3f\nMAX: %.2f\nMIN: %.2f\n",
+	int bytes = sprintf(buff, "\n\n--> PAQUITA FINAL INFO <--\nIMGS: %ld\nSIZE: %.3fKB\nTXTS: %ld\nAVG CONSTELACIONS: %.2f\nCONST TOTALS: %ld\nAVG DENSITAT: %.3f\nMAX: %.2f\nMIN: %.2f\n--> END INFO <--\n\n",
 	received_imgs, imgs_size, received_txts, const_avg, data.total_const, data.density_avg, data.max_mag, data.min_mag);
 	write(1, buff, bytes);
 	

@@ -9,9 +9,9 @@
 struct NewDataMsg MSG_defaultMsg() {
 	struct NewDataMsg msg;
 	msg.id = -1;
-	msg.type[0] = '\0';
-	msg.bytes = 0;
-	msg.file_name[0] = '\0';
+	msg.type = -1;
+	msg.kbytes = 0.0f;
+	msg.astrodata = ASTRODATA_defaultData();
 	return msg;
 }
 
@@ -20,16 +20,16 @@ struct NewDataMsg MSG_defaultMsg() {
 * @Def: Crea un mensaje con los datos especificados
 * @Arg:	In: id = buzon donde se enviara el mensaje
 *		In: type = tipo del fichero recibido
-*		In: bytes = tamano del fichero
-*		In: file_name = nombre del fichero
+*		In: kbytes = tamano del fichero
+*		In: astrodata = informacion del fichero de texto
 * @Ret: Mensaje listo para enviar
 ********************************************************************/
-struct NewDataMsg MSG_newMsg(long id, char type[MAX_TYPE], long bytes, char file_name[MAX_FILE]) {
+struct NewDataMsg MSG_newMsg(long id, int type, double kbytes, struct AstroData astrodata) {
 	struct NewDataMsg msg;
 	msg.id = id;
-	strcpy(msg.type, type);
-	msg.bytes = bytes;
-	strcpy(msg.file_name, file_name);
+	msg.type = type;
+	msg.kbytes = kbytes;
+	msg.astrodata = astrodata;
 	return msg;
 }
 
@@ -41,7 +41,7 @@ struct NewDataMsg MSG_newMsg(long id, char type[MAX_TYPE], long bytes, char file
 *******************************************/
 void MSG_cleanMsg(struct NewDataMsg * msg) {
 	msg->id = -1;
-	msg->type[0] = '\0';
-	msg->bytes = 0;
-	msg->file_name[0] = '\0';
+	msg->type = -1;
+	msg->kbytes = 0.0f;
+	ASTRODATA_cleanData(&(msg->astrodata));
 }

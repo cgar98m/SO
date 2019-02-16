@@ -318,18 +318,19 @@ int FILE_createFile(char * file_name, char * data, long bytes) {
 
 /************************************************************
 * @Nombre: FILE_updateRegister
-* @Def: Anade informacion al registro llamado REGISTER_FILE
+* @Def: Anade informacion al registro especificado
 * @Arg:	In: info = informacion nueva
+*		In: file = fichero a actualizar
 * @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
 ************************************************************/
-int FILE_updateRegister(char * info) {
+int FILE_updateRegister(char * info, char * file) {
 	
 	int fd;
 	char full_path[MAX_PATH];
 	
 	//Get full path
 	strcpy(full_path, FILE_PATH);
-	strcat(full_path, REGISTER_FILE);
+	strcat(full_path, file);
 	
 	//Open file
 	fd = open(full_path, O_WRONLY | O_APPEND | O_CREAT, 0644);

@@ -19,8 +19,9 @@
 //Files path
 #define FILE_PATH "server_files/"
 
-//Register file
-#define REGISTER_FILE "Kalkun.txt"
+//Register files
+#define IMG_REGISTER "Kalkun.txt"
+#define TXT_REGISTER "Kalkun_v2.txt"
 
 /***************************************************************
 * @Nombre: FILE_readConfig
@@ -51,11 +52,12 @@ int FILE_createFile(char * file_name, char * data, long bytes);
 
 /************************************************************
 * @Nombre: FILE_updateRegister
-* @Def: Anade informacion al registro llamado REGISTER_FILE
+* @Def: Anade informacion al registro especificado
 * @Arg:	In: info = informacion nueva
+*		In: file = fichero a actualizar
 * @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
 ************************************************************/
-int FILE_updateRegister(char * info);
+int FILE_updateRegister(char * info, char * file);
 
 /**************************************************************
 * @Nombre: FILE_getAstroData
