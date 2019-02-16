@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#Check args
+if [ $# -ne 1 ]
+then
+	echo "A new port is required"
+	exit 1
+fi
+
+#Get port
+port=$1
+
+#Get files called telescope
+list=$(ls | grep "^telescope")
+total=$(echo $list | wc -c)
+
+#List loop
+i=0
+while [ $i -le $total ]
+do
+
+	#Get file
+	file=$(echo $list | awk -F ' ' -v i=$i '{print $i}')
+
+	#Check if it's a file
+	if [ -f "$file" ]
+	then
+
+		#Notify change
+		oldPort=$(cat $file | head -4 | tail -1 | awk -F '\r' '{print $1}')
+		echo "Changing port $oldPort from $file to $port"
+
+		#Replace port
+		sed -i "4s/.*/$port/" $file
+
+	fi
+
+	let i=$i+1
+
+done
