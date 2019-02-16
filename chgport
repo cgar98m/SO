@@ -11,7 +11,12 @@ fi
 port=$1
 
 #Get files called telescope
-list=$(ls | grep "^telescope")
+list=$(ls | grep "^telescope" | grep ".txt$")
+
+#Add server file
+list="$list server.txt"
+
+#Get total files
 total=$(echo $list | wc -c)
 
 #List loop
@@ -26,12 +31,28 @@ do
 	if [ -f "$file" ]
 	then
 
-		#Notify change
-		oldPort=$(cat $file | head -4 | tail -1 | awk -F '\r' '{print $1}')
-		echo "Changing port $oldPort from $file to $port"
+		#Check file type
+		isTelescope=$(echo $file | grep "^telescope" | grep ".txt$")
+		if [ "$isTelescope" == "" ]
+		then
 
-		#Replace port
-		sed -i "4s/.*/$port/" $file
+			#Notify change
+			oldPort=$(cat $file | head -2 | tail -1 | awk -F '\r' '{print $1}')
+			echo "Changing port $oldPort from $file to $port"
+
+			#Replace port
+			sed -i "2s/.*/$port/" $file
+
+		else
+
+			#Notify change
+			oldPort=$(cat $file | head -4 | tail -1 | awk -F '\r' '{print $1}')
+			echo "Changing port $oldPort from $file to $port"
+
+			#Replace port
+			sed -i "4s/.*/$port/" $file
+
+		fi
 
 	fi
 
