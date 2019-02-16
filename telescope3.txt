@@ -1,0 +1,5 @@
+Telescope3
+3
+127.0.0.1
+8151
+telescope3
