@@ -8,9 +8,9 @@
 #define CONNECT_T 0x01
 #define DISCONNECT_T 0x02
 
-//Send data type
+//Send data types
 #define DATA_T 0x03
-#define NO_DATA_T 0x05
+#define NO_DATA_T 0x06
 
 //Connection headers
 #define CONNECT_OK_H "[CONOK]"
