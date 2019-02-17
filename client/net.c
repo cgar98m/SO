@@ -23,9 +23,16 @@ int NET_establishConnection(char * ip, int port, int * server_fd) {
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
 	
-	//Set ip
-	if(inet_aton(ip, &addr.sin_addr) == 0) {
+	//Get ip
+	struct hostent * host = gethostbyname(ip);
+	if(host == NULL) {
 		close(*server_fd);
+		return -1;
+	}
+	struct in_addr * address = (void *) *host->h_addr_list;
+	
+	//Set ip
+	if(inet_aton(inet_ntoa(*address), &addr.sin_addr) == 0) {
 		return -1;
 	}
 	

@@ -30,14 +30,6 @@
 //Register max buffer
 #define MAX_ROW 128
 
-//NetPackage
-struct NetPackage {
-	char type;
-	char * header;
-	long length;
-	char * data;
-};
-
 /*****************************************************************************
 * @Nombre: NET_openServer
 * @Def: Abre un socket para escuchar las peticiones de los possibles clientes

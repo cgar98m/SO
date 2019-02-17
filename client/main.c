@@ -311,6 +311,10 @@ int main(int argc, char ** argv) {
 	turn_off = -1;
 	CONFIG_defaultConfig(&config);
 	server_fd = -1;
+	
+	//Rewrite SIGINT and SIGPIPE
+	signal(SIGINT, closeProgram);
+	signal(SIGPIPE, closeProgram);
 
 	//Check arguments
 	if(argc != 2) {
@@ -349,10 +353,6 @@ int main(int argc, char ** argv) {
 		exit(EXIT_FAILURE);
 	}
 	write(1, CONNECT_OK, strlen(CONNECT_OK));
-	
-	//Rewrite SIGINT and SIGPIPE
-	signal(SIGINT, closeProgram);
-	signal(SIGPIPE, closeProgram);
 	
 	//Look for files loop
 	signal(SIGALRM, lookForFiles);
