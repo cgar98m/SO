@@ -159,7 +159,6 @@ int FILE_readConfig(struct Config * config, char * file_name) {
 * @Nombre: md5sum
 * @Def: Obtiene el md5sum de un file descriptor
 * @Arg:	In: fd = configuracion vacia
-*		In: file_name = nombre del fichero
 * @Ret: devuelve el md5sum (NULL si hay un error)
 **************************************************/
 char * md5sum(int fd) {

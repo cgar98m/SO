@@ -13,6 +13,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <sys/msg.h>
+#include <netdb.h>
 
 #include "menu.h"
 #include "netpack.h"
@@ -53,6 +54,7 @@ int NET_acceptConnection(int fd, struct sockaddr_in addr);
 * @Nombre: NET_sendDisconnectMsg
 * @Def: Envia un paquete al cliente para informar de su desconexion
 * @Arg:	In: fd = file descriptor de la conexion
+*		In: type = tipus de paquet (1 = OK, -1 = KO)
 * @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
 *******************************************************************/
 int NET_sendDisconnectMsg(int fd, int type);

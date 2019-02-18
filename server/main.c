@@ -110,12 +110,12 @@ void initSemaphores() {
 	SEM_init(&info_s, 1);	//Mutex
 }
 
-/***********************************************************************************
+/*******************************************************************
 * @Nombre: clientManagement
 * @Def: Maneja la conexion con un cliente
 * @Arg:	In: client = file descriptor de la conexion con el cliente
-* @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal (establecimiento de conexion)
-***********************************************************************************/
+* @Ret: devuelve NULL
+*******************************************************************/
 void * clientManagement(void * client) {
 	
 	//Get socket

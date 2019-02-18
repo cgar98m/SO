@@ -23,9 +23,16 @@ int NET_openServer(char * ip, int port, struct sockaddr_in * addr) {
 	addr->sin_family = AF_INET;
 	addr->sin_port = htons(port);
 	
+	//Get ip
+	struct hostent * host = gethostbyname(ip);
+	if(host == NULL) {
+		close(*server_fd);
+		return -1;
+	}
+	struct in_addr * address = (void *) *host->h_addr_list;
+	
 	//Set ip
-	if(inet_aton(ip, &addr->sin_addr) == 0) {
-		close(fd);
+	if(inet_aton(inet_ntoa(*address), &addr.sin_addr) == 0) {
 		return -1;
 	}
 	

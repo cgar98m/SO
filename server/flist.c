@@ -2,7 +2,7 @@
 
 /*****************************************************
 * @Nombre: FLIST_create
-* @Def: Crea una nueva lista de enteros
+* @Def: Crea una nueva lista de ids
 * @Arg:	Out: list = puntero donde crear la lista
 * @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
 *****************************************************/
@@ -21,7 +21,7 @@ int FLIST_create(struct FList * list) {
 
 /***********************************************************************
 * @Nombre: FLIST_add
-* @Def: Anade un entero a la lista siempre que no exista ya
+* @Def: Anade un id a la lista siempre que no exista ya
 * @Arg:	In/Out: list = puntero a la lista
 *		In: e = elemento a anadir
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si ya existia
@@ -82,7 +82,7 @@ int FLIST_add(struct FList * list, pthread_t e) {
 
 /***********************************************************************
 * @Nombre: FLIST_remove
-* @Def: Elimina un entero de la lista
+* @Def: Elimina un id de la lista
 * @Arg:	In/Out: list = puntero a la lista
 *		In: e = elemento a eliminar
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal y -2 si no existia
@@ -130,10 +130,9 @@ int FLIST_remove(struct FList * list, pthread_t e) {
 }
 
 /***************************************************
-* @Nombre: FLIST_get
-* @Def: Obten un entero de la lista
+* @Nombre: FLIST_getFirst
+* @Def: Obten el primer id de la lista
 * @Arg:	In: list = puntero a la lista
-*		In: i = indice del elemento a obtener
 *		Out: e = numero a devolver
 * @Ret: devuelve 1 si ha ido bien, -1 si ha ido mal
 ***************************************************/
