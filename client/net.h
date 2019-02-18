@@ -82,6 +82,12 @@ int NET_disconnectReply(int server_fd);
 *********************************************************************************/
 int NET_sendData(int server_fd, char * data, long bytes, char * date, char type[4], char * path, int * turn_off);
 
+/***************************************************************
+* @Nombre: NET_sendNoData
+* @Def: Notifica al servidor de que no hay ficheros por enviar
+* @Arg:	In: server_fd = file descriptor de la conexion
+* @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
+***************************************************************/
 int NET_sendNoData(int server_fd);
 
 #endif

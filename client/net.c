@@ -399,6 +399,7 @@ int sendDataEnd(char * file_name, char * path, int server_fd) {
 *		In: data = informacion del fichero
 *		In: file_name = nombre del fichero
 *		In: server_fd = file descriptor de la conexion con el servidor
+*		In: path = carpeta donde se encuentra el fichero
 * @Ret: devuelve 1 si ha ido bien, 2 si se ha enviado toda la información,
 *		-1 si falla la respuesta del servidor o el servidor se ha desconectado,
 *		-2 si falla el procesamiento de datos y -3 si se quiere desconectar el
@@ -588,6 +589,12 @@ int NET_sendData(int server_fd, char * data, long bytes, char * date, char type[
 
 }
 
+/***************************************************************
+* @Nombre: NET_sendNoData
+* @Def: Notifica al servidor de que no hay ficheros por enviar
+* @Arg:	In: server_fd = file descriptor de la conexion
+* @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
+***************************************************************/
 int NET_sendNoData(int server_fd) {
 
 	struct NetPack pack;

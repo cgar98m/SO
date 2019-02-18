@@ -219,7 +219,7 @@ void toLowerCase(char * string) {
 * @Arg:	In/Out: pointer = puntero a tratar
 *		In: file_name = nombre del fichero
 *		In: total = ficheros actuales
-* @Ret: ---
+* @Ret: devuelve 1 si ha ido bien, -1 si no
 **************************************************/
 int addFile(char *** pointer, char * file_name, int total) {
 
@@ -284,6 +284,7 @@ void freeFileData(char *** pointer, int total) {
 * @Arg:	Out: txt = referencia del puntero a los nombres de ficheros .txt
 *		Out: jpg = referencia del puntero a los nombres de ficheros .jpg
 *		Out: total = array con el total de ficheros de ambos tipos
+*		In: path = capeta donde se encuentran los ficheros
 * @Ret: devuelve 1 si ha ido bien y -1 si ha ido mal
 *************************************************************************/
 int FILE_getDirectoryFiles(char *** txt, char *** jpg, int total[2], char * path) {

@@ -19,6 +19,7 @@
 #define TXT_ENDING "txt"
 #define JPG_ENDING "jpg"
 
+//File types
 #define TXT_FILE 0
 #define JPG_FILE 1
 
