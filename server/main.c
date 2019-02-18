@@ -11,7 +11,6 @@
 #include "net.h"
 #include "flist.h"
 #include "msg.h"
-#include "lista.h"
 
 //Message queue data
 #define KEY_FILE "makefile"
