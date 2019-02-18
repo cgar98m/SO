@@ -33,6 +33,7 @@ int NET_establishConnection(char * ip, int port, int * server_fd) {
 	
 	//Set ip
 	if(inet_aton(inet_ntoa(*address), &addr.sin_addr) == 0) {
+		close(*server_fd);
 		return -1;
 	}
 	
